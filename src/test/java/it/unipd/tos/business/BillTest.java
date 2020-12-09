@@ -156,5 +156,52 @@ public class BillTest {
 //        81 - 9*0.5 - 0.1*76.5 (SubTotal)  = 68.85 
         assertEquals(68.85d, bill.getOrderPrice(), DELTA);
     }
+    
+    @Test
+    public void test_GetOrderPrice_ItemsOrderedMoreThanThirty_ExceptionThrown() throws TakeAwayBillException {
+        thrown.expect(TakeAwayBillException.class);
+        thrown.expectMessage("The bill cannot have more than 30 items");
+        MenuItem item01 = new MenuItem(ItemType.GELATO, "gelato 01", 10d);
+        MenuItem item02 = new MenuItem(ItemType.GELATO, "gelato 02", 12d);
+        MenuItem item03 = new MenuItem(ItemType.GELATO, "gelato 03", 15d);
+        MenuItem item04 = new MenuItem(ItemType.GELATO, "gelato 04", 9d);
+        MenuItem item05 = new MenuItem(ItemType.GELATO, "gelato 05", 11d);
+        MenuItem item06 = new MenuItem(ItemType.GELATO, "gelato 06", 10d);
+        MenuItem item07 = new MenuItem(ItemType.BUDINO, "budino 03", 9d);
+        MenuItem item08 = new MenuItem(ItemType.BEVANDA, "bevanda 01", 5d);
+        MenuItem item09 = new MenuItem(ItemType.GELATO, "gelato 07", 10d);
+        MenuItem item10 = new MenuItem(ItemType.GELATO, "gelato 08", 12d);
+        MenuItem item11 = new MenuItem(ItemType.GELATO, "gelato 09", 15d);
+        MenuItem item12 = new MenuItem(ItemType.GELATO, "gelato 10", 9d);
+        MenuItem item13 = new MenuItem(ItemType.GELATO, "gelato 11", 11d);
+        MenuItem item14 = new MenuItem(ItemType.GELATO, "gelato 12", 10d);
+        MenuItem item15 = new MenuItem(ItemType.BUDINO, "budino 02", 9d);
+        MenuItem item16 = new MenuItem(ItemType.BEVANDA, "bevanda 02", 5d);
+        MenuItem item17 = new MenuItem(ItemType.GELATO, "gelato 13", 10d);
+        MenuItem item18 = new MenuItem(ItemType.GELATO, "gelato 14", 12d);
+        MenuItem item19 = new MenuItem(ItemType.GELATO, "gelato 15", 15d);
+        MenuItem item20 = new MenuItem(ItemType.GELATO, "gelato 16", 9d);
+        MenuItem item21 = new MenuItem(ItemType.GELATO, "gelato 17", 11d);
+        MenuItem item22 = new MenuItem(ItemType.GELATO, "gelato 18", 10d);
+        MenuItem item23 = new MenuItem(ItemType.BUDINO, "budino 01", 9d);
+        MenuItem item24 = new MenuItem(ItemType.BEVANDA, "bevanda 03", 5d);
+        MenuItem item25 = new MenuItem(ItemType.GELATO, "gelato 19", 10d);
+        MenuItem item26 = new MenuItem(ItemType.GELATO, "gelato 20", 12d);
+        MenuItem item27 = new MenuItem(ItemType.GELATO, "gelato 21", 15d);
+        MenuItem item28 = new MenuItem(ItemType.GELATO, "gelato 22", 9d);
+        MenuItem item29 = new MenuItem(ItemType.GELATO, "gelato 23", 11d);
+        MenuItem item30 = new MenuItem(ItemType.GELATO, "gelato 24", 10d);
+        MenuItem item31 = new MenuItem(ItemType.BUDINO, "budino 04", 9d);
+        MenuItem item32 = new MenuItem(ItemType.BEVANDA, "bevanda 04", 5d);
+
+        this.items = Stream.of(
+                item01, item02, item03, item04, item05, item06, item07, item08, item09, item10, 
+                item11, item12, item13, item14, item15, item16, item17, item18, item19, item20, 
+                item21, item22, item23, item24, item25, item26, item27, item28, item29, item30, 
+                item31, item32).collect(Collectors.toList());
+        bill = new Bill(LocalTime.of(11, 30), items, user);
+        
+        bill.getOrderPrice();
+    }
 }
 

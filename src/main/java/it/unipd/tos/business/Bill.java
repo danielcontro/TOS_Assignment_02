@@ -41,6 +41,8 @@ public class Bill implements TakeAwayBill {
             throw new TakeAwayBillException("The bill cannot have an empty list of items");
         } else if (items.contains(null)) {
             throw new TakeAwayBillException("The list of items of the bill cannot have a null item");
+        } else if (items.size() > 30) {
+            throw new TakeAwayBillException("The bill cannot have more than 30 items");
         }
         
         total = items.stream()
