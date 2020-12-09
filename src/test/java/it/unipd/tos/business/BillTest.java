@@ -100,5 +100,22 @@ public class BillTest {
         bill = new Bill(LocalTime.of(11, 30), listWithNullItem, user);
         bill.getOrderPrice();
     }
+    
+    @Test
+    public void test_GetOrderPrice_ItemsOrderedWithMoreThan5IceCreams_Calculated() throws TakeAwayBillException {
+        MenuItem item1 = new MenuItem(ItemType.GELATO, "gelato 01", 3.5d);
+        MenuItem item2 = new MenuItem(ItemType.GELATO, "gelato 02", 4.0d);
+        MenuItem item3 = new MenuItem(ItemType.GELATO, "gelato 03", 2.5d);
+        MenuItem item4 = new MenuItem(ItemType.GELATO, "gelato 04", 3.0d);
+        MenuItem item5 = new MenuItem(ItemType.GELATO, "gelato 05", 5.0d);
+        MenuItem item6 = new MenuItem(ItemType.GELATO, "gelato 06", 4.0d);
+        this.items = Stream.of(item1, item2, item3, item4, item5, item6)
+                .collect(Collectors.toList());
+
+        bill = new Bill(LocalTime.of(11, 30), items, user);
+        
+//        22 - 0.5*2.5 (CheapestIceCreamPrice) = 20.75
+        assertEquals(20.75d, bill.getOrderPrice(), DELTA);
+    }
 }
 

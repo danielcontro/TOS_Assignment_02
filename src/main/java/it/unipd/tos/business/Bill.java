@@ -5,17 +5,20 @@
 package it.unipd.tos.business;
 
 import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.List;
 
 import it.unipd.tos.business.exception.TakeAwayBillException;
 import it.unipd.tos.model.User;
 import it.unipd.tos.model.MenuItem;
+import it.unipd.tos.model.MenuItem.ItemType;
 
 public class Bill implements TakeAwayBill {
     
     private final LocalTime billTime;
     private List<MenuItem> items;
     private User user;
+    private double total = 0;
 
     public Bill(final LocalTime billTime, List<MenuItem> itemsOrdered, User user) throws TakeAwayBillException {
         if (billTime == null) {
@@ -39,9 +42,34 @@ public class Bill implements TakeAwayBill {
         } else if (items.contains(null)) {
             throw new TakeAwayBillException("The list of items of the bill cannot have a null item");
         }
-        return items.stream()
+        
+        total = items.stream()
                 .mapToDouble(MenuItem::getPrice)
                 .reduce(0d, Double::sum);
         
+        return getSubTotal();
     }
+    
+    private double getSubTotal() {
+        if (this.containsMoreThanFiveIceCreams()) {
+            total -= getCheapestIceCreamPrice()*0.5;
+        }
+        return total;
+    }
+    
+    private boolean containsMoreThanFiveIceCreams() {
+        return items.stream()
+                .filter(
+                        el -> el.getItemType().equals(ItemType.GELATO))
+                .count() > 5;
+    }
+    
+    private double getCheapestIceCreamPrice() {
+        return items.stream()
+                .filter(
+                        el -> el.getItemType().equals(ItemType.GELATO))
+                .min(
+                        Comparator.comparing(MenuItem::getPrice))
+                .get().getPrice();
+    }   
 }
