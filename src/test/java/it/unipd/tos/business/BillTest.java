@@ -5,6 +5,8 @@
 package it.unipd.tos.business;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -12,6 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,6 +57,11 @@ public class BillTest {
                 .collect(Collectors.toList());
 
         bill = new Bill(LocalTime.of(18, 5), items, user);
+    }
+    
+    @After
+    public void reset() {
+        Bill.resetGiveAways();
     }
     
     @Test
@@ -238,6 +246,78 @@ public class BillTest {
         
 //        9.5 - 0.5*1.0(CheapsetIceCreamPrice) + 0.5 = 9.5
         assertEquals(9.5d, bill.getOrderPrice(), DELTA);
+    }
+    
+    @Test
+    public void test_IsEligibleForGiveAway_OfAgeUserWrongTime_Calculated() throws TakeAwayBillException {
+        bill = new Bill(LocalTime.of(11, 30), items, user);
+        assertFalse(bill.isEligibleForGiveAway());
+    }
+    
+    @Test
+    public void test_IsEligibleForGiveAway_OfAgeUserRightTime_Calculated() throws TakeAwayBillException {
+        bill = new Bill(LocalTime.of(18, 30), items, user);
+        assertFalse(bill.isEligibleForGiveAway());
+    }
+    
+    @Test
+    public void test_IsEligibleForGiveAway_UnderageUserWrongTime_Calculated() throws TakeAwayBillException {
+        bill = new Bill(LocalTime.of(11, 30), items, new User("Mario", "Rossi", 14));
+        assertFalse(bill.isEligibleForGiveAway());
+    }
+    
+    @Test
+    public void test_IsEligibleForGiveAway_UnderageUserRightTime_Calculated() throws TakeAwayBillException {
+        bill = new Bill(LocalTime.of(18, 30), items, new User("Mario", "Rossi", 14));
+        assertTrue(bill.isEligibleForGiveAway());
+    }
+    
+    @Test
+    public void test_IsEligibleForGiveAway_AlreadyGiftedBill_Calculated() throws TakeAwayBillException {
+        bill = new Bill(LocalTime.of(18, 30), items, new User("Mario", "Rossi", 14));
+        bill.getOrderPrice();
+        assertFalse(bill.isEligibleForGiveAway());
+    }
+    
+    @Test
+    public void test_IsEligibleForGiveAway_AlreadyGiftedTenBills_Calculated() throws TakeAwayBillException {
+        
+        Bill bill1 = new Bill(LocalTime.of(18, 00), items, new User("Mario", "Bianchi", 14));
+        Bill bill2 = new Bill(LocalTime.of(18, 01), items, new User("Mario", "Verdi", 14));
+        Bill bill3 = new Bill(LocalTime.of(18, 02), items, new User("Marco", "Rossi", 14));
+        Bill bill4 = new Bill(LocalTime.of(18, 03), items, new User("Marco", "Bianchi", 14));
+        Bill bill5 = new Bill(LocalTime.of(18, 04), items, new User("Marco", "Verdi", 14));
+        Bill bill6 = new Bill(LocalTime.of(18, 30), items, new User("Andrea", "Rossi", 14));
+        Bill bill7 = new Bill(LocalTime.of(18, 30), items, new User("Andrea", "Bianchi", 14));
+        Bill bill8 = new Bill(LocalTime.of(18, 30), items, new User("Andrea", "Verdi", 14));
+        Bill bill9 = new Bill(LocalTime.of(18, 30), items, new User("Matteo", "Rossi", 14));
+        Bill bill10 = new Bill(LocalTime.of(18, 30), items, new User("Matteo", "Bianchi", 14));
+        bill1.getOrderPrice();
+        bill2.getOrderPrice();
+        bill3.getOrderPrice();
+        bill4.getOrderPrice();
+        bill5.getOrderPrice();
+        bill6.getOrderPrice();
+        bill7.getOrderPrice();
+        bill8.getOrderPrice();
+        bill9.getOrderPrice();
+        bill10.getOrderPrice();
+        
+        bill = new Bill(LocalTime.of(18, 30), items, new User("Mario", "Rossi", 14));
+        assertFalse(bill.isEligibleForGiveAway());
+    }
+    
+    @Test
+    public void test_GetOrderPrice_GiftedBill_Calculated() throws TakeAwayBillException {
+        bill = new Bill(LocalTime.of(18, 30), items, new User("Mario", "Rossi", 14));
+        assertEquals(0d, bill.getOrderPrice(), DELTA);
+    }
+    
+    @Test
+    public void test_IsGifted_AlreadyGiftedBill() throws TakeAwayBillException {
+        bill = new Bill(LocalTime.of(18, 30), items, new User("Mario", "Rossi", 14));
+        bill.getOrderPrice();
+        assertTrue(bill.isGifted());
     }
 }
 

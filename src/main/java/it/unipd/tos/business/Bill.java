@@ -15,11 +15,14 @@ import it.unipd.tos.model.MenuItem.ItemType;
 
 public class Bill implements TakeAwayBill {
     
+    public static int giftedBills = 0;
+    
     private final LocalTime billTime;
     private List<MenuItem> items;
     private User user;
     private double total = 0;
-
+    private boolean gifted = false;
+    
     public Bill(final LocalTime billTime, List<MenuItem> itemsOrdered, User user) throws TakeAwayBillException {
         if (billTime == null) {
             throw new TakeAwayBillException("The bill cannot have a null time");
@@ -35,6 +38,10 @@ public class Bill implements TakeAwayBill {
         this.user = user;
     }
 
+    public static void resetGiveAways() {
+        giftedBills = 0;
+    }
+    
     @Override
     public double getOrderPrice() throws TakeAwayBillException {
         if (items.size() <= 0) {
@@ -62,6 +69,9 @@ public class Bill implements TakeAwayBill {
         if (total < 10) {
             total += 0.5d;
         }
+        if (this.isEligibleForGiveAway()) {
+            this.giftBill();
+        }
         return total;
     }
     
@@ -88,5 +98,19 @@ public class Bill implements TakeAwayBill {
                 .mapToDouble(MenuItem::getPrice)
                 .reduce(0d, Double::sum) > 50;
                 
+    }
+    
+    public boolean isEligibleForGiveAway() {
+        return user.isUnderage() && (billTime.getHour() == 18) && (giftedBills < 10) && !gifted;
+    }
+    
+    private void giftBill() {
+        gifted = true;
+        giftedBills++;
+        total = 0;
+    }
+    
+    public boolean isGifted() {
+        return gifted;
     }
 }
