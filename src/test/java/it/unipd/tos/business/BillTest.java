@@ -102,7 +102,7 @@ public class BillTest {
     }
     
     @Test
-    public void test_GetOrderPrice_ItemsOrderedWithMoreThan5IceCreams_Calculated() throws TakeAwayBillException {
+    public void test_GetOrderPrice_ItemsOrderedWithMoreThanFiveIceCreams_Calculated() throws TakeAwayBillException {
         MenuItem item1 = new MenuItem(ItemType.GELATO, "gelato 01", 3.5d);
         MenuItem item2 = new MenuItem(ItemType.GELATO, "gelato 02", 4.0d);
         MenuItem item3 = new MenuItem(ItemType.GELATO, "gelato 03", 2.5d);
@@ -202,6 +202,42 @@ public class BillTest {
         bill = new Bill(LocalTime.of(11, 30), items, user);
         
         bill.getOrderPrice();
+    }
+    
+    @Test
+    public void test_GetOrderPrice_TotalLessThanTen_Calculated() throws TakeAwayBillException {
+        MenuItem item1 = new MenuItem(ItemType.GELATO, "gelato 01", 2.5d);
+        MenuItem item2 = new MenuItem(ItemType.BUDINO, "budino 01", 2.0d);
+        MenuItem item3 = new MenuItem(ItemType.GELATO, "gelato 02", 2.0d);
+        MenuItem item4 = new MenuItem(ItemType.GELATO, "gelato 03", 2.0d);
+        MenuItem item5 = new MenuItem(ItemType.GELATO, "gelato 04", 1.0d);
+        
+        this.items = Stream.of(item1, item2, item3, item4, item5)
+                .collect(Collectors.toList());
+        
+        bill = new Bill(LocalTime.of(11, 30), items, user);
+        
+//        9.5 + 0.5 = 10
+        assertEquals(10d, bill.getOrderPrice(), DELTA);
+    }
+    
+    @Test
+    public void test_GetOrderPrice_TotalLessThanTenWithMoreThanFiveIceCreams_Calculated() throws TakeAwayBillException {
+        MenuItem item1 = new MenuItem(ItemType.GELATO, "gelato 01", 1.5d);
+        MenuItem item2 = new MenuItem(ItemType.BUDINO, "budino 01", 1.0d);
+        MenuItem item3 = new MenuItem(ItemType.GELATO, "gelato 02", 2.0d);
+        MenuItem item4 = new MenuItem(ItemType.GELATO, "gelato 03", 2.0d);
+        MenuItem item5 = new MenuItem(ItemType.GELATO, "gelato 04", 1.0d);
+        MenuItem item6 = new MenuItem(ItemType.GELATO, "gelato 05", 1.0d);
+        MenuItem item7 = new MenuItem(ItemType.GELATO, "gelato 06", 1.0d);
+        
+        this.items = Stream.of(item1, item2, item3, item4, item5, item6, item7)
+                .collect(Collectors.toList());
+        
+        bill = new Bill(LocalTime.of(11, 30), items, user);
+        
+//        9.5 - 0.5*1.0(CheapsetIceCreamPrice) + 0.5 = 9.5
+        assertEquals(9.5d, bill.getOrderPrice(), DELTA);
     }
 }
 

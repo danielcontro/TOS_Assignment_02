@@ -59,6 +59,9 @@ public class Bill implements TakeAwayBill {
         if (this.isTotalWithoutDrinksOverFifty()) {
             total -= 0.1d*total;
         }
+        if (total < 10) {
+            total += 0.5d;
+        }
         return total;
     }
     
