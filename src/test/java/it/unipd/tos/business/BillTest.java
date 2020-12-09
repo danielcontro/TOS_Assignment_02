@@ -117,5 +117,44 @@ public class BillTest {
 //        22 - 0.5*2.5 (CheapestIceCreamPrice) = 20.75
         assertEquals(20.75d, bill.getOrderPrice(), DELTA);
     }
+    
+    @Test
+    public void test_GetOrderPrice_ItemsOrderedWithoutDrinksOverFifty_Calculated() throws TakeAwayBillException {
+        MenuItem item1 = new MenuItem(ItemType.GELATO, "gelato 01", 10d);
+        MenuItem item2 = new MenuItem(ItemType.GELATO, "gelato 02", 12d);
+        MenuItem item3 = new MenuItem(ItemType.GELATO, "gelato 03", 15d);
+        MenuItem item4 = new MenuItem(ItemType.BUDINO, "budino 01", 9d);
+        MenuItem item5 = new MenuItem(ItemType.BUDINO, "budino 02", 11d);
+        MenuItem item6 = new MenuItem(ItemType.BUDINO, "budino 03", 10d);
+        MenuItem item7 = new MenuItem(ItemType.BEVANDA, "bevanda 01", 5d);
+        
+        this.items = Stream.of(item1, item2, item3, item4, item5, item6, item7)
+                .collect(Collectors.toList());
+        
+        bill = new Bill(LocalTime.of(11, 30), items, user);
+        
+//        72 - 0.1*72 = 64.8
+        assertEquals(64.8d, bill.getOrderPrice(), DELTA);
+    }
+    
+    @Test
+    public void test_GetOrderPrice_ItemsOrderedWithoutDrinksOverFiftyAndMoreThanFiveIceCreams_Calculated() throws TakeAwayBillException {
+        MenuItem item1 = new MenuItem(ItemType.GELATO, "gelato 01", 10d);
+        MenuItem item2 = new MenuItem(ItemType.GELATO, "gelato 02", 12d);
+        MenuItem item3 = new MenuItem(ItemType.GELATO, "gelato 03", 15d);
+        MenuItem item4 = new MenuItem(ItemType.GELATO, "gelato 04", 9d);
+        MenuItem item5 = new MenuItem(ItemType.GELATO, "gelato 05", 11d);
+        MenuItem item6 = new MenuItem(ItemType.GELATO, "gelato 06", 10d);
+        MenuItem item7 = new MenuItem(ItemType.BUDINO, "budino 01", 9d);
+        MenuItem item8 = new MenuItem(ItemType.BEVANDA, "bevanda 01", 5d);
+        
+        this.items = Stream.of(item1, item2, item3, item4, item5, item6, item7, item8)
+                .collect(Collectors.toList());
+        
+        bill = new Bill(LocalTime.of(11, 30), items, user);
+        
+//        81 - 9*0.5 - 0.1*76.5 (SubTotal)  = 68.85 
+        assertEquals(68.85d, bill.getOrderPrice(), DELTA);
+    }
 }
 

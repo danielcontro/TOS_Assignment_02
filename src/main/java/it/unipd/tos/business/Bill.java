@@ -54,6 +54,9 @@ public class Bill implements TakeAwayBill {
         if (this.containsMoreThanFiveIceCreams()) {
             total -= getCheapestIceCreamPrice()*0.5;
         }
+        if (this.isTotalWithoutDrinksOverFifty()) {
+            total -= 0.1d*total;
+        }
         return total;
     }
     
@@ -71,5 +74,14 @@ public class Bill implements TakeAwayBill {
                 .min(
                         Comparator.comparing(MenuItem::getPrice))
                 .get().getPrice();
-    }   
+    }
+    
+    private boolean isTotalWithoutDrinksOverFifty() {
+        return items.stream()
+                .filter(
+                        el -> el.getItemType().equals(ItemType.GELATO) || el.getItemType().equals(ItemType.BUDINO))
+                .mapToDouble(MenuItem::getPrice)
+                .reduce(0d, Double::sum) > 50;
+                
+    }
 }
